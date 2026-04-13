@@ -1,0 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Fira Code', monospace;
+  background: #0d0d0d;
+  color: #e5e5e5;
+  margin: 0;
+}
+
+.wallet-adapter-button {
+  font-family: 'Fira Code', monospace !important;
+}
