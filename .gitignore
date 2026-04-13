@@ -1,16 +1,25 @@
+# dependencies
 node_modules/
 dist/
 build/
+
+# environment
 .env
 .env.*
 !.env.example
+
+# anchor build
 target/
 .anchor/
 test-ledger/
+
+# python
 __pycache__/
 *.pyc
 .venv/
 venv/
+
+# misc
 .DS_Store
 .vercel
 *.log
