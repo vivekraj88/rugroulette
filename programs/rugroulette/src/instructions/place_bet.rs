@@ -47,7 +47,7 @@ pub struct PlaceBet<'info> {
 
 /// Places a RUG or LEGIT bet on an open market.
 /// Transfers SOL from bettor to the market account and updates pool totals.
-pub fn handler(ctx: Context<PlaceBet>, side: BetSide, amount: u64) -> Result<()> {
+pub fn handle_place_bet(ctx: Context<PlaceBet>, side: BetSide, amount: u64) -> Result<()> {
     let factory = &ctx.accounts.factory;
     let market = &ctx.accounts.market;
     let now = Clock::get()?.unix_timestamp;

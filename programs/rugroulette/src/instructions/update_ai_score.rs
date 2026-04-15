@@ -26,7 +26,7 @@ pub struct UpdateAiScore<'info> {
 
 /// Updates the AI-generated rug probability score for an open market.
 /// Called by the crank after running Claude API analysis on the token.
-pub fn handler(ctx: Context<UpdateAiScore>, new_score: u8) -> Result<()> {
+pub fn handle_update_ai_score(ctx: Context<UpdateAiScore>, new_score: u8) -> Result<()> {
     require!(new_score <= 100, RugError::InvalidAiScore);
 
     let market = &mut ctx.accounts.market;

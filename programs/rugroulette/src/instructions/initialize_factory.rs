@@ -22,7 +22,7 @@ pub struct InitializeFactory<'info> {
 
 /// Creates the global MarketFactory configuration.
 /// Should be called once by the admin before any markets can be created.
-pub fn handler(
+pub fn handle_initialize_factory(
     ctx: Context<InitializeFactory>,
     market_fee_bps: u16,
     min_bet: u64,

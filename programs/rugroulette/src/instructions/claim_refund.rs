@@ -29,7 +29,10 @@ pub struct ClaimRefund<'info> {
 }
 
 /// Refunds a bet from a cancelled market. Closes the bet account.
-pub fn handler(ctx: Context<ClaimRefund>) -> Result<()> {
+pub fn handle_claim_refund(ctx: Context<ClaimRefund>) -> Result<()> {
+    // explicitly mark claimed before account closure
+    ctx.accounts.user_bet.claimed = true;
+
     let refund = ctx.accounts.user_bet.amount;
 
     let market_info = ctx.accounts.market.to_account_info();

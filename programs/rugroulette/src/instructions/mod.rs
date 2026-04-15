@@ -6,6 +6,8 @@ pub mod claim_winnings;
 pub mod cancel_market;
 pub mod update_ai_score;
 pub mod claim_refund;
+pub mod claim_loss;
+pub mod update_factory;
 
 pub use initialize_factory::*;
 pub use create_market::*;
@@ -15,3 +17,5 @@ pub use claim_winnings::*;
 pub use cancel_market::*;
 pub use update_ai_score::*;
 pub use claim_refund::*;
+pub use claim_loss::*;
+pub use update_factory::*;

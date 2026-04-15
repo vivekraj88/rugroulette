@@ -45,13 +45,14 @@ pub struct ClaimWinnings<'info> {
 
 /// Claims proportional winnings from a resolved market.
 /// Formula: payout = (user_bet / winning_pool) * losing_pool * (1 - fee)
-pub fn handler(ctx: Context<ClaimWinnings>) -> Result<()> {
+pub fn handle_claim_winnings(ctx: Context<ClaimWinnings>) -> Result<()> {
     let market = &ctx.accounts.market;
-    let bet = &ctx.accounts.user_bet;
+    let bet_side = ctx.accounts.user_bet.side.clone();
+    let bet_amount = ctx.accounts.user_bet.amount;
     let result_is_rug = market.result.ok_or(RugError::MarketNotReady)?;
 
     // check user bet on winning side
-    let user_won = match bet.side {
+    let user_won = match bet_side {
         BetSide::Rug => result_is_rug,
         BetSide::Legit => !result_is_rug,
     };
@@ -66,15 +67,18 @@ pub fn handler(ctx: Context<ClaimWinnings>) -> Result<()> {
 
     // fee already deducted during resolve, so losing_pool on-chain is post-fee
     // payout = user_bet_amount + (user_bet / winning_pool) * losing_pool
-    let share_of_losers = bet.amount
+    let share_of_losers = bet_amount
         .checked_mul(losing_pool)
         .ok_or(RugError::MathOverflow)?
         .checked_div(winning_pool.max(1))
         .ok_or(RugError::MathOverflow)?;
 
-    let total_payout = bet.amount
+    let total_payout = bet_amount
         .checked_add(share_of_losers)
         .ok_or(RugError::MathOverflow)?;
+
+    // explicitly mark claimed before account closure
+    ctx.accounts.user_bet.claimed = true;
 
     // transfer from market account to bettor (validate balance first)
     let market_info = ctx.accounts.market.to_account_info();
@@ -102,7 +106,7 @@ pub fn handler(ctx: Context<ClaimWinnings>) -> Result<()> {
     msg!(
         "claimed {} lamports (bet: {} + winnings: {})",
         total_payout,
-        bet.amount,
+        bet_amount,
         share_of_losers
     );
     Ok(())
