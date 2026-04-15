@@ -1,7 +1,9 @@
 """AI scorer — uses Claude API to analyze token rug probability."""
 
 import anthropic
-from config import ANTHROPIC_API_KEY
+from config import ANTHROPIC_API_KEY, ANTHROPIC_MODEL, get_logger
+
+log = get_logger('ai_scorer')
 
 SCORING_PROMPT = """You are a Solana token analyst. Analyze this token and give a rug probability score from 0-100.
 
@@ -21,23 +23,28 @@ Return ONLY a number 0-100. Nothing else."""
 async def score_token(token: dict) -> int:
     """Score a token's rug probability using Claude API."""
     if not ANTHROPIC_API_KEY:
-        print("ANTHROPIC_API_KEY not set, using heuristic scoring")
+        log.info("no ANTHROPIC_API_KEY — heuristic scoring for %s", token.get('name', '?'))
         return _heuristic_score(token)
 
     client = anthropic.AsyncAnthropic(api_key=ANTHROPIC_API_KEY)
-
     prompt = SCORING_PROMPT.format(**token)
 
-    message = await client.messages.create(
-        model="claude-sonnet-4-20250514",
-        max_tokens=10,
-        messages=[{"role": "user", "content": prompt}],
-    )
-
     try:
-        score = int(message.content[0].text.strip())
-        return max(0, min(100, score))
-    except (ValueError, IndexError):
+        message = await client.messages.create(
+            model=ANTHROPIC_MODEL,
+            max_tokens=10,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        raw = message.content[0].text.strip()
+        score = int(raw)
+        clamped = max(0, min(100, score))
+        log.info("AI scored %s: %d (raw: %s)", token.get('name', '?'), clamped, raw)
+        return clamped
+    except (ValueError, IndexError) as exc:
+        log.warning("AI response parse error: %s — falling back to heuristic", exc)
+        return _heuristic_score(token)
+    except anthropic.APIError as exc:
+        log.error("Claude API error: %s — falling back to heuristic", exc)
         return _heuristic_score(token)
 
 
@@ -58,4 +65,6 @@ def _heuristic_score(token: dict) -> int:
             score += 10
             break
 
-    return max(0, min(100, score))
+    result = max(0, min(100, score))
+    log.info("heuristic scored %s: %d", token.get('name', '?'), result)
+    return result

@@ -7,9 +7,11 @@ import sys
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
-from config import SCAN_INTERVAL_MINUTES, RESOLVE_CHECK_INTERVAL_MINUTES
+from config import SCAN_INTERVAL_MINUTES, RESOLVE_CHECK_INTERVAL_MINUTES, get_logger
 from market_creator import create_markets
 from market_resolver import resolve_markets
+
+log = get_logger('crank')
 
 
 def setup_scheduler() -> AsyncIOScheduler:
@@ -39,11 +41,11 @@ def setup_scheduler() -> AsyncIOScheduler:
 
 async def run_initial_cycle():
     """Run both cranks once on startup before scheduler takes over."""
-    print("--- initial scan cycle ---")
+    log.info("--- initial scan cycle ---")
     await create_markets()
-    print("--- initial resolve cycle ---")
+    log.info("--- initial resolve cycle ---")
     await resolve_markets()
-    print("--- scheduler active ---")
+    log.info("--- scheduler active ---")
 
 
 def main():
@@ -52,7 +54,7 @@ def main():
     asyncio.set_event_loop(loop)
 
     def shutdown(sig_num, frame):
-        print("\nshutting down crank...")
+        log.info("shutting down crank (signal %s)...", sig_num)
         scheduler.shutdown(wait=False)
         loop.stop()
         sys.exit(0)
@@ -61,9 +63,9 @@ def main():
     signal.signal(signal.SIGTERM, shutdown)
 
     scheduler.start()
-    print(
-        f"crank running | scan: {SCAN_INTERVAL_MINUTES}m | "
-        f"resolve: {RESOLVE_CHECK_INTERVAL_MINUTES}m"
+    log.info(
+        "crank running | scan: %dm | resolve: %dm",
+        SCAN_INTERVAL_MINUTES, RESOLVE_CHECK_INTERVAL_MINUTES
     )
 
     loop.run_until_complete(run_initial_cycle())

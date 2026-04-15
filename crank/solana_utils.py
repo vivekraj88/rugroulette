@@ -47,8 +47,11 @@ async def send_and_confirm_tx(
     Returns the transaction signature string.
     Raises on send failure or confirmation timeout.
     """
+    from solana.rpc.types import TxOpts
+
     ix = Instruction(program_id=program_id, accounts=accounts, data=ix_data)
 
+    # Fetch fresh blockhash right before signing
     recent = await client.get_latest_blockhash(commitment=Confirmed)
     blockhash = recent.value.blockhash
 
@@ -56,7 +59,10 @@ async def send_and_confirm_tx(
     tx = Transaction.new_unsigned(msg)
     tx.sign([signer], blockhash)
 
-    resp = await client.send_transaction(tx)
+    resp = await client.send_transaction(
+        tx,
+        opts=TxOpts(skip_preflight=False, preflight_commitment=Confirmed),
+    )
     sig = resp.value
 
     await client.confirm_transaction(sig, commitment=Confirmed)

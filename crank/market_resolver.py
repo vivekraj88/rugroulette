@@ -108,11 +108,11 @@ def encode_resolve_data(
     return bytes(buf)
 
 
-def get_initial_price(token_mint_str: str) -> float:
-    """Look up the initial price from the tracking file written by the creator crank."""
+def get_initial_data(token_mint_str: str) -> tuple[float, float]:
+    """Look up initial price and liquidity from the tracking file."""
     tracking = atomic_json_read(TRACKING_FILE, default={})
     entry = tracking.get(token_mint_str, {})
-    return entry.get("price", 0.001)
+    return entry.get("price", 0.001), entry.get("liquidity", 0)
 
 
 async def fetch_open_markets(
@@ -166,9 +166,9 @@ async def resolve_markets():
 
             try:
                 mint_str = str(market["token_mint"])
-                initial_price = get_initial_price(mint_str)
+                initial_price, initial_liq = get_initial_data(mint_str)
 
-                resolution = await check_resolution(mint_str, initial_price)
+                resolution = await check_resolution(mint_str, initial_price, initial_liq)
                 is_rug = resolution["result"]
 
                 ix_data = encode_resolve_data(is_rug, resolution, authority.pubkey())
