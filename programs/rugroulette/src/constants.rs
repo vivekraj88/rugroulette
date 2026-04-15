@@ -14,7 +14,7 @@ pub const PROFILE_SEED: &[u8] = b"profile";
 pub const DEFAULT_FEE_BPS: u16 = 300;
 
 /// Default auto-resolution period in days.
-pub const DEFAULT_RESOLVE_DAYS: u8 = 7;
+pub const DEFAULT_RESOLVE_DAYS: u8 = 1;
 
 /// Seconds in one day (used for resolve_at calculation).
 pub const SECONDS_PER_DAY: i64 = 86_400;

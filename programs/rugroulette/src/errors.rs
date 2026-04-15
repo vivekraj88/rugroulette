@@ -24,4 +24,6 @@ pub enum RugError {
     InvalidAiScore,
     #[msg("Market betting window has expired")]
     BettingClosed,
+    #[msg("User did not lose this market")]
+    NotALoser,
 }
