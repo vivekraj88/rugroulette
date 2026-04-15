@@ -26,7 +26,7 @@ pub struct CancelMarket<'info> {
 
 /// Cancels a market. Individual bet refunds happen via separate claim_refund instruction.
 /// Sets market status to Cancelled so bettors can reclaim their SOL.
-pub fn handler(ctx: Context<CancelMarket>) -> Result<()> {
+pub fn handle_cancel_market(ctx: Context<CancelMarket>) -> Result<()> {
     let market = &mut ctx.accounts.market;
     market.status = MarketStatus::Cancelled;
     market.result = None;

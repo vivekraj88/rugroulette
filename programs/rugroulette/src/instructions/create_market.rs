@@ -32,7 +32,7 @@ pub struct CreateMarket<'info> {
 
 /// Creates a new prediction market for a given token.
 /// The market will auto-resolve after `auto_resolve_days` from the factory config.
-pub fn handler(
+pub fn handle_create_market(
     ctx: Context<CreateMarket>,
     token_mint: Pubkey,
     token_name: String,

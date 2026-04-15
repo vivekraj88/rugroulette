@@ -35,7 +35,7 @@ pub struct ResolveMarket<'info> {
 
 /// Resolves a market after the resolution window has passed.
 /// Collects the platform fee and marks the market as resolved.
-pub fn handler(
+pub fn handle_resolve_market(
     ctx: Context<ResolveMarket>,
     result: bool,
     data: ResolutionData,
