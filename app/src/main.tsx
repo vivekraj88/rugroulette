@@ -10,6 +10,7 @@ import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adap
 import { Buffer } from 'buffer';
 
 import App from './App';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { RugProgramProvider } from './hooks/useProgram';
 import './index.css';
 import '@solana/wallet-adapter-react-ui/styles.css';
@@ -23,17 +24,19 @@ function Root() {
   const wallets = useMemo(() => [new PhantomWalletAdapter(), new SolflareWalletAdapter()], []);
 
   return (
-    <ConnectionProvider endpoint={RPC_URL}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>
-          <BrowserRouter>
-            <RugProgramProvider>
-              <App />
-            </RugProgramProvider>
-          </BrowserRouter>
-        </WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
+    <ErrorBoundary>
+      <ConnectionProvider endpoint={RPC_URL}>
+        <WalletProvider wallets={wallets} autoConnect>
+          <WalletModalProvider>
+            <BrowserRouter>
+              <RugProgramProvider>
+                <App />
+              </RugProgramProvider>
+            </BrowserRouter>
+          </WalletModalProvider>
+        </WalletProvider>
+      </ConnectionProvider>
+    </ErrorBoundary>
   );
 }
 
