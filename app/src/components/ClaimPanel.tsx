@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey, SystemProgram } from '@solana/web3.js';
-import { useRugProgram } from '../hooks/useProgram';
+import { useRugProgram } from '../hooks/useRugProgram';
 import { PROGRAM_ID, FACTORY_SEED, MARKET_SEED, BET_SEED, PROFILE_SEED } from '../lib/constants';
 import type { MarketAccount } from '../hooks/useMarkets';
 
@@ -24,7 +24,6 @@ export function ClaimPanel({ market }: ClaimPanelProps) {
   const [success, setSuccess] = useState('');
   const [userBet, setUserBet] = useState<UserBetData | null | undefined>(undefined);
 
-  // Fetch user's bet for this market
   useEffect(() => {
     if (!publicKey || !connection) { setUserBet(null); return; }
     let cancelled = false;
@@ -42,8 +41,7 @@ export function ClaimPanel({ market }: ClaimPanelProps) {
       if (!info) { setUserBet(null); return; }
       try {
         const data = info.data;
-        // skip 8 discriminator + 32 user + 32 market
-        let offset = 72;
+        let offset = 72; // 8 disc + 32 user + 32 market
         const sideByte = data[offset]; offset += 1;
         const amount = Number(data.readBigUInt64LE(offset)); offset += 8;
         offset += 8; // placed_at
@@ -54,19 +52,9 @@ export function ClaimPanel({ market }: ClaimPanelProps) {
       }
     }).catch(() => { if (!cancelled) setUserBet(null); });
     return () => { cancelled = true; };
-  }, [publicKey, connection, market.pubkey]);
+  }, [publicKey, connection, market.pubkey, market.tokenMint]);
 
-  if (!publicKey || userBet === undefined) return null;
-  if (userBet === null) return null;
-
-  const isWinner = market.status === 'Resolved' && (
-    (market.result === true && userBet.side === 'rug') ||
-    (market.result === false && userBet.side === 'legit')
-  );
-  const isCancelled = market.status === 'Cancelled';
-  const canClaim = (isWinner || isCancelled) && !userBet.claimed;
-
-  async function handleClaim() {
+  const handleClaim = useCallback(async () => {
     if (!program || !publicKey) return;
     setClaiming(true);
     setError('');
@@ -88,9 +76,10 @@ export function ClaimPanel({ market }: ClaimPanelProps) {
         PROGRAM_ID
       );
 
-      if (isCancelled) {
-        // claimRefund only needs: market, userBet, bettor, systemProgram
-        await (program.methods as any).claimRefund()
+      const isCancelledMarket = market.status === 'Cancelled';
+
+      if (isCancelledMarket) {
+        await program.methods.claimRefund()
           .accountsPartial({
             market: marketPda,
             userBet: betPda,
@@ -99,8 +88,7 @@ export function ClaimPanel({ market }: ClaimPanelProps) {
           })
           .rpc();
       } else {
-        // claimWinnings needs: factory, market, userBet, userProfile, bettor, systemProgram
-        await (program.methods as any).claimWinnings()
+        await program.methods.claimWinnings()
           .accountsPartial({
             factory,
             market: marketPda,
@@ -112,10 +100,10 @@ export function ClaimPanel({ market }: ClaimPanelProps) {
           .rpc();
       }
 
-      setSuccess(isCancelled ? 'Refund claimed!' : 'Winnings claimed!');
+      setSuccess(isCancelledMarket ? 'Refund claimed!' : 'Winnings claimed!');
       setUserBet((prev) => prev ? { ...prev, claimed: true } : prev);
-    } catch (err: any) {
-      const msg = err?.message || String(err);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
       if (msg.includes('User rejected')) {
         setError('Transaction rejected');
       } else if (msg.includes('AlreadyClaimed')) {
@@ -127,16 +115,35 @@ export function ClaimPanel({ market }: ClaimPanelProps) {
     } finally {
       setClaiming(false);
     }
+  }, [program, publicKey, market.tokenMint, market.status]);
+
+  if (!publicKey) return null;
+
+  if (userBet === undefined) {
+    return (
+      <div className="card bg-base-300 border border-base-content/10 p-4 flex justify-center">
+        <span className="loading loading-spinner loading-sm text-error" aria-label="Loading bet data" />
+      </div>
+    );
   }
+
+  if (userBet === null) return null;
+
+  const isWinner = market.status === 'Resolved' && (
+    (market.result === true && userBet.side === 'rug') ||
+    (market.result === false && userBet.side === 'legit')
+  );
+  const isCancelled = market.status === 'Cancelled';
+  const canClaim = (isWinner || isCancelled) && !userBet.claimed;
 
   const betAmountSol = (userBet.amount / 1e9).toFixed(3);
 
   return (
-    <div className="card bg-base-300 border border-gray-800 p-4 space-y-3">
+    <div className="card bg-base-300 border border-base-content/10 p-4 space-y-3" role="region" aria-label="Your bet status">
       <h3 className="font-bold text-sm">Your Bet</h3>
       <div className="flex justify-between items-center text-sm">
         <span>
-          <span className={userBet.side === 'rug' ? 'text-rug font-bold' : 'text-legit font-bold'}>
+          <span className={userBet.side === 'rug' ? 'text-error font-bold' : 'text-success font-bold'}>
             {userBet.side.toUpperCase()}
           </span>
           {' '}&mdash;{' '}{betAmountSol} SOL
@@ -146,24 +153,25 @@ export function ClaimPanel({ market }: ClaimPanelProps) {
         )}
       </div>
       {isWinner && !userBet.claimed && (
-        <div className="text-sm text-legit font-bold">You won!</div>
+        <div className="text-sm text-success font-bold" role="status">You won!</div>
       )}
       {market.status === 'Resolved' && !isWinner && (
-        <div className="text-sm text-rug">Better luck next time</div>
+        <div className="text-sm text-error">Better luck next time</div>
       )}
       {canClaim && (
         <button
           className={`btn btn-sm w-full ${isCancelled ? 'btn-warning' : 'btn-success'}`}
           onClick={handleClaim}
           disabled={claiming}
+          aria-busy={claiming}
         >
           {claiming ? (
             <span className="loading loading-spinner loading-sm" />
           ) : isCancelled ? 'Claim Refund' : 'Claim Winnings'}
         </button>
       )}
-      {error && <p className="text-error text-xs">{error}</p>}
-      {success && <p className="text-success text-xs">{success}</p>}
+      {error && <p className="text-error text-xs" role="alert">{error}</p>}
+      {success && <p className="text-success text-xs" role="status">{success}</p>}
     </div>
   );
 }

@@ -5,8 +5,7 @@ interface CountdownProps {
 }
 
 function formatCountdown(resolveAt: number): string {
-  const now = Date.now() / 1000;
-  const diff = resolveAt - now;
+  const diff = resolveAt - Date.now() / 1000;
   if (diff <= 0) return 'Ended';
   const days = Math.floor(diff / 86400);
   const hrs = Math.floor((diff % 86400) / 3600);
@@ -20,20 +19,21 @@ function formatCountdown(resolveAt: number): string {
 
 export function Countdown({ resolveAt }: CountdownProps) {
   const [display, setDisplay] = useState(() => formatCountdown(resolveAt));
+  const [isUrgent, setIsUrgent] = useState(false);
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    function tick() {
       setDisplay(formatCountdown(resolveAt));
-    }, 1000);
+      const diff = resolveAt - Date.now() / 1000;
+      setIsUrgent(diff > 0 && diff < 3600);
+    }
+    tick();
+    const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
   }, [resolveAt]);
 
-  const now = Date.now() / 1000;
-  const diff = resolveAt - now;
-  const isUrgent = diff > 0 && diff < 3600;
-
   return (
-    <span className={isUrgent ? 'text-yellow-400 font-bold' : ''}>
+    <span className={isUrgent ? 'text-warning font-bold' : ''} aria-label={`Time remaining: ${display}`}>
       {display}
     </span>
   );
