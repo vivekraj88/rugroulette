@@ -8,7 +8,7 @@ export function NotFoundPage() {
       <p className="text-sm text-base-content/50 max-w-sm">
         The page you&apos;re looking for doesn&apos;t exist or has been moved.
       </p>
-      <Link to="/" className="btn btn-error btn-sm">
+      <Link to="/app" className="btn btn-error btn-sm">
         Back to Markets
       </Link>
     </div>

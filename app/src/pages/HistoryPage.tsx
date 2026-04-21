@@ -130,13 +130,15 @@ export function HistoryPage() {
             return (
               <div
                 key={m.pubkey}
-                className={`card bg-base-300 border p-3 cursor-pointer hover:bg-base-200/50 transition-colors ${
-                  unclaimed ? 'border-success/50' : 'border-base-content/10'
-                }`}
-                onClick={() => navigate(`/market/${m.pubkey}`)}
+                className={`card bg-gradient-to-r ${
+                  m.result ? 'from-error/5' : 'from-success/5'
+                } to-base-300 border p-3 cursor-pointer hover:bg-base-200/50 hover:-translate-x-0.5 transition-all duration-200 ${
+                  unclaimed ? 'border-success/50 glow-green' : 'border-base-content/10'
+                } border-l-2 ${m.result ? 'border-l-error' : 'border-l-success'}`}
+                onClick={() => navigate(`/app/market/${m.pubkey}`)}
                 role="button"
                 tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && navigate(`/market/${m.pubkey}`)}
+                onKeyDown={(e) => e.key === 'Enter' && navigate(`/app/market/${m.pubkey}`)}
               >
                 <div className="flex items-center gap-3">
                   {/* Unclaimed indicator */}
