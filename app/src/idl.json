@@ -9,6 +9,9 @@
   "instructions": [
     {
       "name": "cancel_market",
+      "docs": [
+        "Cancel an unresolved market and enable refunds."
+      ],
       "discriminator": [
         205,
         121,
@@ -71,7 +74,109 @@
       "args": []
     },
     {
+      "name": "claim_loss",
+      "docs": [
+        "Close a losing bet account and recover rent. Resets streak."
+      ],
+      "discriminator": [
+        183,
+        227,
+        255,
+        34,
+        9,
+        132,
+        178,
+        228
+      ],
+      "accounts": [
+        {
+          "name": "market",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  114,
+                  107,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market.token_mint",
+                "account": "PredictionMarket"
+              }
+            ]
+          }
+        },
+        {
+          "name": "user_bet",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market"
+              },
+              {
+                "kind": "account",
+                "path": "bettor"
+              }
+            ]
+          }
+        },
+        {
+          "name": "user_profile",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bettor"
+              }
+            ]
+          }
+        },
+        {
+          "name": "bettor",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "claim_refund",
+      "docs": [
+        "Claim a refund from a cancelled market."
+      ],
       "discriminator": [
         15,
         16,
@@ -109,7 +214,27 @@
         },
         {
           "name": "user_bet",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market"
+              },
+              {
+                "kind": "account",
+                "path": "bettor"
+              }
+            ]
+          }
         },
         {
           "name": "bettor",
@@ -125,6 +250,9 @@
     },
     {
       "name": "claim_winnings",
+      "docs": [
+        "Claim winnings from a correctly predicted market."
+      ],
       "discriminator": [
         161,
         215,
@@ -181,7 +309,27 @@
         },
         {
           "name": "user_bet",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "market"
+              },
+              {
+                "kind": "account",
+                "path": "bettor"
+              }
+            ]
+          }
         },
         {
           "name": "user_profile",
@@ -221,6 +369,9 @@
     },
     {
       "name": "create_market",
+      "docs": [
+        "Create a new market for token prediction."
+      ],
       "discriminator": [
         103,
         226,
@@ -302,6 +453,9 @@
     },
     {
       "name": "initialize_factory",
+      "docs": [
+        "Initialize the prediction market factory."
+      ],
       "discriminator": [
         179,
         64,
@@ -356,6 +510,9 @@
     },
     {
       "name": "place_bet",
+      "docs": [
+        "Place a bet on whether a token is a rug pull."
+      ],
       "discriminator": [
         222,
         62,
@@ -485,6 +642,9 @@
     },
     {
       "name": "resolve_market",
+      "docs": [
+        "Resolve a market with the final outcome."
+      ],
       "discriminator": [
         155,
         23,
@@ -569,6 +729,9 @@
     },
     {
       "name": "update_ai_score",
+      "docs": [
+        "Update the AI-generated rug score for a market."
+      ],
       "discriminator": [
         47,
         245,
@@ -632,6 +795,62 @@
         {
           "name": "new_score",
           "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "update_factory",
+      "docs": [
+        "Update factory settings (authority only)."
+      ],
+      "discriminator": [
+        183,
+        55,
+        14,
+        110,
+        32,
+        166,
+        162,
+        88
+      ],
+      "accounts": [
+        {
+          "name": "factory",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  99,
+                  116,
+                  111,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "auto_resolve_days",
+          "type": "u8"
+        },
+        {
+          "name": "market_fee_bps",
+          "type": "u16"
+        },
+        {
+          "name": "min_bet",
+          "type": "u64"
         }
       ]
     }
@@ -745,6 +964,11 @@
       "code": 6010,
       "name": "BettingClosed",
       "msg": "Market betting window has expired"
+    },
+    {
+      "code": 6011,
+      "name": "NotALoser",
+      "msg": "User did not lose this market"
     }
   ],
   "types": [
