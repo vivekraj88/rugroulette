@@ -45,7 +45,7 @@ function Pct({ value }: { value: number | null }) {
 function Flag({ label, active }: { label: string; active: boolean }) {
   if (!active) return null;
   return (
-    <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-error/15 text-error">
+    <span className="inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded bg-error/15 text-error">
       {'\u26A0'} {label}
     </span>
   );
@@ -108,7 +108,7 @@ export function TokenInfo({ mint }: { mint: string }) {
 
   if (loading) {
     return (
-      <div className="bg-base-300 border border-base-content/10 rounded-xl p-3 flex justify-center">
+      <div className="glass-panel rounded-xl p-3 flex justify-center">
         <span className="loading loading-spinner loading-sm text-error" />
       </div>
     );
@@ -116,7 +116,7 @@ export function TokenInfo({ mint }: { mint: string }) {
 
   if (!data) {
     return (
-      <div className="bg-base-300 border border-base-content/10 rounded-xl p-3 text-xs text-base-content/30 text-center">
+      <div className="glass-panel rounded-xl p-3 text-xs text-base-content/30 text-center">
         Token data unavailable
       </div>
     );
@@ -125,7 +125,7 @@ export function TokenInfo({ mint }: { mint: string }) {
   const buyRatio = data.totalTxns24h > 0 ? Math.round((data.buys24h / data.totalTxns24h) * 100) : 50;
 
   return (
-    <div className="bg-base-300 border border-base-content/10 rounded-xl p-3 space-y-3 text-xs">
+    <div className="glass-panel rounded-xl p-3 space-y-3 text-xs">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
@@ -141,15 +141,15 @@ export function TokenInfo({ mint }: { mint: string }) {
       {/* Price changes */}
       <div className="grid grid-cols-3 gap-1.5 text-center">
         <div className="bg-base-100 rounded px-2 py-1">
-          <div className="text-[9px] text-base-content/30">1h</div>
+          <div className="text-[10px] text-base-content/30">1h</div>
           <Pct value={data.priceChange1h} />
         </div>
         <div className="bg-base-100 rounded px-2 py-1">
-          <div className="text-[9px] text-base-content/30">6h</div>
+          <div className="text-[10px] text-base-content/30">6h</div>
           <Pct value={data.priceChange6h} />
         </div>
         <div className="bg-base-100 rounded px-2 py-1">
-          <div className="text-[9px] text-base-content/30">24h</div>
+          <div className="text-[10px] text-base-content/30">24h</div>
           <Pct value={data.priceChange24h} />
         </div>
       </div>
@@ -157,19 +157,19 @@ export function TokenInfo({ mint }: { mint: string }) {
       {/* Key metrics */}
       <div className="grid grid-cols-2 gap-1.5">
         <div className="bg-base-100 rounded px-2 py-1">
-          <div className="text-[9px] text-base-content/30">Market Cap</div>
+          <div className="text-[10px] text-base-content/30">Market Cap</div>
           <div className="font-bold">{usd(data.marketCap)}</div>
         </div>
         <div className="bg-base-100 rounded px-2 py-1">
-          <div className="text-[9px] text-base-content/30">Liquidity</div>
+          <div className="text-[10px] text-base-content/30">Liquidity</div>
           <div className="font-bold">{usd(data.liquidity)}</div>
         </div>
         <div className="bg-base-100 rounded px-2 py-1">
-          <div className="text-[9px] text-base-content/30">FDV</div>
+          <div className="text-[10px] text-base-content/30">FDV</div>
           <div className="font-bold">{usd(data.fdv)}</div>
         </div>
         <div className="bg-base-100 rounded px-2 py-1">
-          <div className="text-[9px] text-base-content/30">24h Volume</div>
+          <div className="text-[10px] text-base-content/30">24h Volume</div>
           <div className="font-bold">{usd(data.volume24h)}</div>
         </div>
       </div>
@@ -177,7 +177,7 @@ export function TokenInfo({ mint }: { mint: string }) {
       {/* Trades buy/sell */}
       <div className="space-y-1">
         <Row label="24h Txns">{num(data.totalTxns24h)}</Row>
-        <div className="flex justify-between text-[9px]">
+        <div className="flex justify-between text-[10px]">
           <span className="text-success">Buy {num(data.buys24h)} ({buyRatio}%)</span>
           <span className="text-error">Sell {num(data.sells24h)} ({100 - buyRatio}%)</span>
         </div>
@@ -206,13 +206,13 @@ export function TokenInfo({ mint }: { mint: string }) {
         const activeFlags = flags.filter((f) => f.active);
         return (
           <div className="space-y-1.5">
-            <div className="text-[9px] font-bold text-base-content/30 uppercase">Risk Flags</div>
+            <div className="text-[10px] font-bold text-base-content/30 uppercase">Risk Flags</div>
             {activeFlags.length > 0 ? (
               <div className="flex flex-wrap gap-1">
                 {activeFlags.map((f) => <Flag key={f.label} label={f.label} active />)}
               </div>
             ) : (
-              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-success/10 text-success">
+              <span className="inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded bg-success/10 text-success">
                 {'\u2713'} No risks detected
               </span>
             )}

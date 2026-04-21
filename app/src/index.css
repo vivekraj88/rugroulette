@@ -4,13 +4,264 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: 'Fira Code', monospace;
   background: #0d0d0d;
   color: #e5e5e5;
   margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
+/* Selection */
+::selection {
+  background: rgba(239, 68, 68, 0.3);
+  color: #fff;
+}
+
+/* Dark scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0d0d0d; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #555; }
+
+/* Wallet adapter overrides */
 .wallet-adapter-button {
   font-family: 'Fira Code', monospace !important;
+  background: #ef4444 !important;
+  border-radius: 0.5rem !important;
+  font-size: 0.75rem !important;
+  height: 2.25rem !important;
+  transition: all 0.2s !important;
+}
+.wallet-adapter-button:hover {
+  background: #dc2626 !important;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.25) !important;
+}
+.wallet-adapter-button-trigger {
+  background: #ef4444 !important;
+}
+.wallet-adapter-button[disabled] {
+  background: #333 !important;
+  opacity: 0.6 !important;
+}
+.wallet-adapter-dropdown {
+  z-index: 100;
+}
+.wallet-adapter-dropdown-list {
+  background: #1a1a1a !important;
+  border: 1px solid rgba(239, 68, 68, 0.2) !important;
+  border-radius: 0.75rem !important;
+  font-family: 'Fira Code', monospace !important;
+  padding: 0.25rem !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(239, 68, 68, 0.08) !important;
+}
+.wallet-adapter-dropdown-list-item {
+  font-family: 'Fira Code', monospace !important;
+  font-size: 0.75rem !important;
+  border-radius: 0.5rem !important;
+  color: #e5e5e5 !important;
+  padding: 0.5rem 0.75rem !important;
+}
+.wallet-adapter-dropdown-list-item:hover {
+  background: rgba(239, 68, 68, 0.1) !important;
+}
+.wallet-adapter-dropdown-list-active {
+  background: rgba(239, 68, 68, 0.15) !important;
+}
+.wallet-adapter-modal-wrapper {
+  background: rgba(13, 13, 13, 0.95) !important;
+  font-family: 'Fira Code', monospace !important;
+}
+.wallet-adapter-modal-container {
+  background: #1a1a1a !important;
+  border: 1px solid rgba(239, 68, 68, 0.15) !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(239, 68, 68, 0.08) !important;
+}
+.wallet-adapter-modal-title {
+  font-family: 'Fira Code', monospace !important;
+  color: #e5e5e5 !important;
+}
+.wallet-adapter-modal-list .wallet-adapter-button {
+  background: #242424 !important;
+  border-radius: 0.5rem !important;
+}
+.wallet-adapter-modal-list .wallet-adapter-button:hover {
+  background: rgba(239, 68, 68, 0.15) !important;
+  box-shadow: none !important;
+}
+.wallet-adapter-modal-button-close {
+  background: #333 !important;
+}
+.wallet-adapter-modal-button-close:hover {
+  background: #ef4444 !important;
+}
+.wallet-adapter-modal-middle-button {
+  background: #ef4444 !important;
+  color: #fff !important;
+  border-radius: 0.5rem !important;
+  font-family: 'Fira Code', monospace !important;
+}
+
+@layer utilities {
+  .glow-red {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.15), 0 0 60px rgba(239, 68, 68, 0.05);
+  }
+  .glow-green {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.15), 0 0 60px rgba(34, 197, 94, 0.05);
+  }
+  .glow-red-strong {
+    box-shadow: 0 0 30px rgba(239, 68, 68, 0.25), 0 0 80px rgba(239, 68, 68, 0.1);
+  }
+  .text-glow-red {
+    text-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+  }
+  .text-glow-green {
+    text-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+  }
+}
+
+@layer components {
+  .glass-panel {
+    background: rgba(26, 26, 26, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+}
+
+/* ── Landing page styles ── */
+
+.landing-gradient-text {
+  background: linear-gradient(135deg, #ef4444 0%, #f97316 50%, #ef4444 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 4s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.btn-cta-landing {
+  display: inline-flex;
+  align-items: center;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.625rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  font-family: 'Fira Code', monospace;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+.btn-cta-landing:hover {
+  background: #dc2626;
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.3), 0 0 60px rgba(239, 68, 68, 0.1);
+  transform: translateY(-1px);
+}
+.btn-cta-landing:active {
+  transform: translateY(0);
+}
+
+.btn-ghost-landing {
+  display: inline-flex;
+  align-items: center;
+  background: transparent;
+  color: #e5e5e5;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.75rem;
+  padding: 0.625rem 1.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  font-family: 'Fira Code', monospace;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+.btn-ghost-landing:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.landing-preview-card {
+  position: relative;
+  background: rgba(26, 26, 26, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.3),
+    0 0 30px rgba(239, 68, 68, 0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.landing-preview-card:hover {
+  transform: perspective(1000px) rotateY(-2deg) rotateX(1deg) scale(1.01);
+  box-shadow:
+    0 12px 50px rgba(0, 0, 0, 0.4),
+    0 0 40px rgba(239, 68, 68, 0.1);
+}
+
+.landing-feature-card {
+  background: rgba(26, 26, 26, 0.5);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+}
+.landing-feature-card:hover {
+  border-color: rgba(239, 68, 68, 0.2);
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.06);
+  transform: translateY(-2px);
+}
+
+.landing-market-card {
+  background: rgba(26, 26, 26, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  transition: all 0.2s ease;
+}
+.landing-market-card:hover {
+  border-color: rgba(239, 68, 68, 0.25);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.06);
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.05); }
+  66% { transform: translate(-20px, 15px) scale(0.95); }
+}
+
+/* Card entry animation */
+@keyframes cardFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-card-in {
+  animation: cardFadeIn 0.4s ease-out both;
+}
+
+/* Pulse glow for claim buttons */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 8px rgba(34, 197, 94, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.5); }
+}
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
 }
