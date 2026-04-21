@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { PROGRAM_ID, PROFILE_SEED } from '../lib/constants';
@@ -12,12 +13,12 @@ interface ProfileData {
   earnings: number;
 }
 
-function getRank(bets: number, winRate: number): { name: string; color: string; emoji: string } {
-  if (bets >= 50 && winRate >= 70) return { name: 'DIAMOND', color: 'text-cyan-300', emoji: '\u{1F48E}' };
-  if (bets >= 30 && winRate >= 60) return { name: 'GOLD', color: 'text-yellow-400', emoji: '\u{1F3C6}' };
-  if (bets >= 15 && winRate >= 50) return { name: 'SILVER', color: 'text-gray-300', emoji: '\u{1F948}' };
-  if (bets >= 5) return { name: 'BRONZE', color: 'text-orange-400', emoji: '\u{1F949}' };
-  return { name: 'ROOKIE', color: 'text-base-content/50', emoji: '\u{1F331}' };
+function getRank(bets: number, winRate: number): { name: string; color: string; badgeBg: string; emoji: string } {
+  if (bets >= 50 && winRate >= 70) return { name: 'DIAMOND', color: 'text-cyan-300', badgeBg: 'bg-cyan-400/10 border-cyan-400/30', emoji: '\u{1F48E}' };
+  if (bets >= 30 && winRate >= 60) return { name: 'GOLD', color: 'text-yellow-400', badgeBg: 'bg-yellow-400/10 border-yellow-400/30', emoji: '\u{1F3C6}' };
+  if (bets >= 15 && winRate >= 50) return { name: 'SILVER', color: 'text-gray-300', badgeBg: 'bg-gray-400/10 border-gray-400/30', emoji: '\u{1F948}' };
+  if (bets >= 5) return { name: 'BRONZE', color: 'text-orange-400', badgeBg: 'bg-orange-400/10 border-orange-400/30', emoji: '\u{1F949}' };
+  return { name: 'ROOKIE', color: 'text-base-content/50', badgeBg: 'bg-base-content/5 border-base-content/10', emoji: '\u{1F331}' };
 }
 
 function WinRateRing({ rate, size = 120 }: { rate: number; size?: number }) {
@@ -112,6 +113,7 @@ export function ProfilePage() {
         <div className="text-6xl">{'\u{1F52E}'}</div>
         <h2 className="text-xl font-bold">No Bets Yet</h2>
         <p className="text-sm text-base-content/40 max-w-xs">Place your first prediction to start building your profile</p>
+        <Link to="/app" className="btn btn-error btn-sm">Browse Markets</Link>
       </div>
     );
   }
@@ -125,7 +127,7 @@ export function ProfilePage() {
   return (
     <div className="p-4 max-w-2xl mx-auto space-y-4">
       {/* Header card */}
-      <div className="card bg-base-300 border border-base-content/10 p-5">
+      <div className="glass-panel rounded-xl p-5">
         <div className="flex items-center gap-4">
           {/* Avatar from wallet */}
           <div className="w-14 h-14 rounded-full bg-gradient-to-br from-error to-success flex items-center justify-center text-2xl font-bold text-base-100 shrink-0">
@@ -134,7 +136,7 @@ export function ProfilePage() {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <span className="font-mono text-sm text-base-content/70 truncate">{addr.slice(0, 6)}...{addr.slice(-4)}</span>
-              <span className={`badge badge-sm ${rank.color} bg-base-100 border-base-content/10 font-bold gap-1`}>
+              <span className={`badge badge-sm ${rank.color} ${rank.badgeBg} font-bold gap-1 border`}>
                 {rank.emoji} {rank.name}
               </span>
             </div>
@@ -151,7 +153,7 @@ export function ProfilePage() {
       {/* Main stats */}
       <div className="grid grid-cols-2 gap-2">
         {/* Total Bets */}
-        <div className="bg-base-100 rounded-xl p-3 space-y-2">
+        <div className="bg-base-200 rounded-xl p-3 space-y-2 border border-base-content/5">
           <div className="flex items-center justify-between">
             <span className="text-[10px] text-base-content/30 uppercase">Total Bets</span>
             <span className="text-lg font-bold">{profile.totalBets}</span>
@@ -169,7 +171,7 @@ export function ProfilePage() {
         </div>
 
         {/* Earnings */}
-        <div className="bg-base-100 rounded-xl p-3 space-y-2">
+        <div className="bg-base-200 rounded-xl p-3 space-y-2 border border-base-content/5">
           <div className="flex items-center justify-between">
             <span className="text-[10px] text-base-content/30 uppercase">Earnings</span>
             <span className={`text-lg font-bold ${profile.earnings >= 0 ? 'text-success' : 'text-error'}`}>
@@ -188,7 +190,7 @@ export function ProfilePage() {
         </div>
 
         {/* Streak */}
-        <div className="bg-base-100 rounded-xl p-3 space-y-2">
+        <div className="bg-base-200 rounded-xl p-3 space-y-2 border border-base-content/5">
           <div className="flex items-center justify-between">
             <span className="text-[10px] text-base-content/30 uppercase">Streak</span>
             <div className="flex items-center gap-1.5">
@@ -209,7 +211,7 @@ export function ProfilePage() {
         </div>
 
         {/* Volume */}
-        <div className="bg-base-100 rounded-xl p-3 space-y-2">
+        <div className="bg-base-200 rounded-xl p-3 space-y-2 border border-base-content/5">
           <div className="flex items-center justify-between">
             <span className="text-[10px] text-base-content/30 uppercase">Volume</span>
             <span className="text-lg font-bold">{(profile.totalVolume / 1e9).toFixed(2)} <span className="text-xs text-base-content/40">SOL</span></span>
@@ -226,7 +228,7 @@ export function ProfilePage() {
       </div>
 
       {/* Win/Loss bar */}
-      <div className="card bg-base-300 border border-base-content/10 p-4 space-y-2">
+      <div className="glass-panel rounded-xl p-4 space-y-2">
         <div className="flex justify-between text-xs">
           <span className="text-success font-bold">{profile.correctPredictions} Wins</span>
           <span className="text-error font-bold">{lossRate} Losses</span>
@@ -238,7 +240,7 @@ export function ProfilePage() {
       </div>
 
       {/* Performance summary */}
-      <div className="card bg-base-300 border border-base-content/10 p-4">
+      <div className="glass-panel rounded-xl p-4">
         <div className="text-xs text-base-content/40 uppercase font-bold mb-2">Performance</div>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">

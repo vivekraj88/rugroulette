@@ -17,7 +17,7 @@ function dateFmt(ts: number): string {
 function TokenChart({ mint }: { mint: string }) {
   const chartUrl = `https://dexscreener.com/solana/${mint}?embed=1&theme=dark&info=0&trades=0`;
   return (
-    <div className="flex flex-col h-full bg-base-300 border border-base-content/10 rounded-xl overflow-hidden">
+    <div className="flex flex-col h-full bg-gradient-to-br from-base-300 to-base-300/80 border border-base-content/10 rounded-xl overflow-hidden shadow-lg shadow-black/20">
       <div className="flex items-center justify-between px-3 pt-2 pb-1 shrink-0">
         <span className="font-bold text-xs">Chart</span>
         <a
@@ -64,7 +64,7 @@ export function MarketDetailPage() {
     return (
       <div className="text-center py-20 text-base-content/40 space-y-3">
         <p className="text-lg">Market not found</p>
-        <Link to="/" className="btn btn-error btn-sm">Back to Markets</Link>
+        <Link to="/app" className="btn btn-error btn-sm">Back to Markets</Link>
       </div>
     );
   }
@@ -77,7 +77,7 @@ export function MarketDetailPage() {
       {/* Compact header */}
       <div className="flex justify-between items-center shrink-0">
         <div className="flex items-center gap-3">
-          <Link to="/" className="text-base-content/30 hover:text-error text-sm">&larr;</Link>
+          <Link to="/app" className="btn btn-ghost btn-xs text-base-content/50 hover:text-error">&larr; Back</Link>
           <div>
             <h1 className="text-lg font-bold text-base-content leading-tight">{market.tokenName}</h1>
             <button
@@ -116,7 +116,7 @@ export function MarketDetailPage() {
             }`}>
               {market.aiScore}%
             </div>
-            <div className="text-[9px] text-base-content/30">Rug Score</div>
+            <div className="text-[10px] text-base-content/30" title="AI-estimated probability that this token will rug">Rug Score</div>
           </div>
         </div>
       </div>
@@ -127,22 +127,22 @@ export function MarketDetailPage() {
         {/* Left column: Pool + Bet + Token Info */}
         <div className="flex flex-col gap-2 overflow-y-auto">
           {/* Pool breakdown */}
-          <div className="bg-base-300 border border-base-content/10 rounded-xl p-3 space-y-2">
+          <div className="glass-panel rounded-xl p-3 space-y-2">
             <h3 className="font-bold text-xs">Pool Breakdown</h3>
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs">
                 <span className="text-error font-bold">RUG</span>
                 <span>{solFmt(market.totalRugPool)} SOL ({rugPct}%)</span>
               </div>
-              <div className="w-full h-2 bg-base-100 rounded-full overflow-hidden">
-                <div className="bg-error h-full rounded-full" style={{ width: `${rugPct}%` }} />
+              <div className="w-full h-2.5 bg-base-100 rounded-full overflow-hidden">
+                <div className="bg-gradient-to-r from-red-600 to-error h-full rounded-full shadow-[0_0_8px_rgba(239,68,68,0.3)]" style={{ width: `${rugPct}%` }} />
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-success font-bold">LEGIT</span>
                 <span>{solFmt(market.totalLegitPool)} SOL ({100 - rugPct}%)</span>
               </div>
-              <div className="w-full h-2 bg-base-100 rounded-full overflow-hidden">
-                <div className="bg-success h-full rounded-full" style={{ width: `${100 - rugPct}%` }} />
+              <div className="w-full h-2.5 bg-base-100 rounded-full overflow-hidden">
+                <div className="bg-gradient-to-r from-success to-green-600 h-full rounded-full shadow-[0_0_8px_rgba(34,197,94,0.3)]" style={{ width: `${100 - rugPct}%` }} />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-1.5 text-[10px] text-base-content/50 pt-1">

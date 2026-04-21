@@ -142,11 +142,11 @@ export function LeaderboardPage() {
           <span className="text-error">Leader</span>board
         </h1>
         <div className="flex items-center gap-2">
-          <div className="btn-group" role="group" aria-label="Time period">
+          <div className="join" role="group" aria-label="Time period">
             {periods.map((p) => (
               <button
                 key={p.key}
-                className={`btn btn-xs ${period === p.key ? 'btn-primary' : 'btn-ghost'}`}
+                className={`btn btn-xs join-item ${period === p.key ? 'btn-error' : 'btn-ghost border-base-content/10'}`}
                 onClick={() => setPeriod(p.key)}
               >
                 {p.label}
@@ -175,7 +175,7 @@ export function LeaderboardPage() {
         <div className="overflow-x-auto">
           <table className="table table-sm w-full">
             <thead>
-              <tr className="text-base-content/50 text-xs">
+              <tr className="text-base-content/50 text-xs sticky top-0 bg-base-100 z-10">
                 <th className="w-10">#</th>
                 <th>Wallet</th>
                 <th className="text-right">Bets</th>
@@ -187,7 +187,10 @@ export function LeaderboardPage() {
             </thead>
             <tbody>
               {sorted.slice(0, 50).map((entry, idx) => (
-                <tr key={entry.wallet} className={`hover:bg-base-200/50 ${!entry.isMock ? 'bg-base-200/20' : ''}`}>
+                <tr key={entry.wallet} className={`hover:bg-error/5 transition-colors ${
+                  idx % 2 === 0 ? 'bg-base-200/20' : ''
+                } ${idx < 3 ? 'border-l-2 ' + (idx === 0 ? 'border-l-warning' : idx === 1 ? 'border-l-base-content/30' : 'border-l-orange-700') : ''
+                } ${!entry.isMock ? 'bg-base-200/30' : ''}`}>
                   <td className="font-bold text-base-content/40">
                     {idx === 0 ? '\u{1F947}' : idx === 1 ? '\u{1F948}' : idx === 2 ? '\u{1F949}' : idx + 1}
                   </td>
