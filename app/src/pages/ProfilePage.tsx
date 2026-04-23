@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
-import { PublicKey } from '@solana/web3.js';
-import { PROGRAM_ID, PROFILE_SEED } from '../lib/constants';
+import { deriveProfilePda } from '../lib/pda';
 
 interface ProfileData {
   totalBets: number;
@@ -57,9 +56,7 @@ export function ProfilePage() {
       setLoading(true);
       setLoadError(null);
       try {
-        const [profilePda] = PublicKey.findProgramAddressSync(
-          [PROFILE_SEED, publicKey!.toBuffer()], PROGRAM_ID
-        );
+        const [profilePda] = deriveProfilePda(publicKey!);
         const info = await connection.getAccountInfo(profilePda);
         if (!info) { setProfile(null); return; }
         const data = info.data;
@@ -181,7 +178,7 @@ export function ProfilePage() {
           <div className="w-full h-1.5 bg-base-content/10 rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full ${profile.earnings >= 0 ? 'bg-success' : 'bg-error'}`}
-              style={{ width: `${Math.min(100, Math.abs(profile.earnings / profile.totalVolume) * 100 + 50)}%` }}
+              style={{ width: `${profile.totalVolume > 0 ? Math.min(100, Math.abs(profile.earnings / profile.totalVolume) * 100 + 50) : 50}%` }}
             />
           </div>
           <div className="text-[10px] text-base-content/40">

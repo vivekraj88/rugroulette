@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 /* ── Scroll reveal hook ── */
-function useReveal(delay = 0) {
+function useReveal() {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   useEffect(() => {
@@ -15,7 +15,7 @@ function useReveal(delay = 0) {
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
-  return { ref, visible, delay };
+  return { ref, visible };
 }
 
 function Reveal({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
