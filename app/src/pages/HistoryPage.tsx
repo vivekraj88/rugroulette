@@ -3,11 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { useMarkets, type MarketAccount } from '../hooks/useMarkets';
-import { PROGRAM_ID, BET_SEED, MARKET_SEED } from '../lib/constants';
-
-function solFmt(l: number): string {
-  return (l / 1e9).toFixed(2);
-}
+import { deriveMarketPda, deriveBetPda } from '../lib/pda';
+import { parseBetAccount, solFmt } from '../lib/format';
 
 function dateFmt(ts: number): string {
   return new Date(ts * 1000).toLocaleDateString();
@@ -33,19 +30,12 @@ function useUserBets(markets: MarketAccount[]) {
       for (const m of markets) {
         try {
           const mintKey = new PublicKey(m.tokenMint);
-          const [marketPda] = PublicKey.findProgramAddressSync(
-            [MARKET_SEED, mintKey.toBuffer()], PROGRAM_ID
-          );
-          const [betPda] = PublicKey.findProgramAddressSync(
-            [BET_SEED, marketPda.toBuffer(), publicKey.toBuffer()], PROGRAM_ID
-          );
+          const [marketPda] = deriveMarketPda(mintKey);
+          const [betPda] = deriveBetPda(marketPda, publicKey);
           const info = await connection.getAccountInfo(betPda);
           if (!info) { result[m.pubkey] = null; continue; }
-          const data = info.data;
-          const sideByte = data[72];
-          const amount = Number(data.readBigUInt64LE(73));
-          const claimed = data[89] === 1;
-          result[m.pubkey] = { side: sideByte === 0 ? 'rug' : 'legit', amount, claimed };
+          const parsed = parseBetAccount(info.data);
+          result[m.pubkey] = parsed;
         } catch {
           result[m.pubkey] = null;
         }

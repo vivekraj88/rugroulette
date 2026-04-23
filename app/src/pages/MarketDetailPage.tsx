@@ -5,10 +5,7 @@ import { BetPanel } from '../components/BetPanel';
 import { ClaimPanel } from '../components/ClaimPanel';
 import { Countdown } from '../components/Countdown';
 import { TokenInfo } from '../components/TokenInfo';
-
-function solFmt(l: number): string {
-  return (l / 1e9).toFixed(2);
-}
+import { solFmt } from '../lib/format';
 
 function dateFmt(ts: number): string {
   return new Date(ts * 1000).toLocaleString();
@@ -47,9 +44,11 @@ export function MarketDetailPage() {
   const [copied, setCopied] = useState(false);
   const mintAddr = market?.tokenMint || '';
   const copyMint = useCallback(() => {
-    navigator.clipboard.writeText(mintAddr);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    try {
+      navigator.clipboard.writeText(mintAddr);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch { /* clipboard unavailable in non-secure context */ }
   }, [mintAddr]);
 
   if (loading) {
