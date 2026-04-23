@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { ProgramContext } from './useProgram';
+import { ProgramContext } from './RugProgramContext';
 
 export function useRugProgram() {
   return useContext(ProgramContext);

@@ -3,7 +3,6 @@ import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import bs58 from 'bs58';
 import { PROGRAM_ID } from '../lib/constants';
-import { useMarketStore } from '../store/marketStore';
 
 const MARKET_DISCRIMINATOR = bs58.encode(
   Uint8Array.from([117, 150, 97, 152, 119, 58, 51, 58])
@@ -96,14 +95,6 @@ export function useMarkets() {
       const valid = parsed.filter((m) => m.status !== 'Cancelled');
       const sorted = valid.sort((a, b) => b.createdAt - a.createdAt);
       setMarkets(sorted);
-      useMarketStore.getState().setMarkets(sorted.map((m) => ({
-        pubkey: m.pubkey,
-        title: m.tokenName,
-        status: m.status === 'Open' ? 0 : m.status === 'Resolved' ? 1 : 2,
-        totalRug: m.totalRugPool,
-        totalLegit: m.totalLegitPool,
-        resolveAt: m.resolveAt,
-      })));
     } catch {
       setFetchError('Failed to load markets');
     } finally {
