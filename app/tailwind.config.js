@@ -6,12 +6,6 @@ export default {
       fontFamily: {
         mono: ['"Fira Code"', 'monospace'],
       },
-      colors: {
-        rug: '#ef4444',
-        legit: '#22c55e',
-        surface: '#1a1a1a',
-        panel: '#242424',
-      },
     },
   },
   plugins: [require('daisyui')],

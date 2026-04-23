@@ -26,4 +26,6 @@ pub enum RugError {
     BettingClosed,
     #[msg("User did not lose this market")]
     NotALoser,
+    #[msg("Invalid configuration: value out of allowed bounds")]
+    InvalidConfig,
 }
