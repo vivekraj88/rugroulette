@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey, SystemProgram } from '@solana/web3.js';
 import { useRugProgram } from '../hooks/useRugProgram';
-import { PROGRAM_ID, FACTORY_SEED, MARKET_SEED, BET_SEED, PROFILE_SEED } from '../lib/constants';
+import { deriveFactoryPda, deriveMarketPda, deriveBetPda, deriveProfilePda } from '../lib/pda';
+import { parseBetAccount } from '../lib/format';
 import type { MarketAccount } from '../hooks/useMarkets';
 
 interface ClaimPanelProps {
@@ -28,26 +29,15 @@ export function ClaimPanel({ market }: ClaimPanelProps) {
     if (!publicKey || !connection) { setUserBet(null); return; }
     let cancelled = false;
     const mintKey = new PublicKey(market.tokenMint);
-    const [marketPda] = PublicKey.findProgramAddressSync(
-      [MARKET_SEED, mintKey.toBuffer()],
-      PROGRAM_ID
-    );
-    const [betPda] = PublicKey.findProgramAddressSync(
-      [BET_SEED, marketPda.toBuffer(), publicKey.toBuffer()],
-      PROGRAM_ID
-    );
+    const [marketPda] = deriveMarketPda(mintKey);
+    const [betPda] = deriveBetPda(marketPda, publicKey);
     connection.getAccountInfo(betPda).then((info) => {
       if (cancelled) return;
       if (!info) { setUserBet(null); return; }
-      try {
-        const data = info.data;
-        let offset = 72; // 8 disc + 32 user + 32 market
-        const sideByte = data[offset]; offset += 1;
-        const amount = Number(data.readBigUInt64LE(offset)); offset += 8;
-        offset += 8; // placed_at
-        const claimed = data[offset] === 1;
-        setUserBet({ side: sideByte === 0 ? 'rug' : 'legit', amount, claimed });
-      } catch {
+      const parsed = parseBetAccount(info.data);
+      if (parsed) {
+        setUserBet({ side: parsed.side, amount: parsed.amount, claimed: parsed.claimed });
+      } else {
         setUserBet(null);
       }
     }).catch(() => { if (!cancelled) setUserBet(null); });
@@ -62,19 +52,10 @@ export function ClaimPanel({ market }: ClaimPanelProps) {
 
     try {
       const mintKey = new PublicKey(market.tokenMint);
-      const [factory] = PublicKey.findProgramAddressSync([FACTORY_SEED], PROGRAM_ID);
-      const [marketPda] = PublicKey.findProgramAddressSync(
-        [MARKET_SEED, mintKey.toBuffer()],
-        PROGRAM_ID
-      );
-      const [betPda] = PublicKey.findProgramAddressSync(
-        [BET_SEED, marketPda.toBuffer(), publicKey.toBuffer()],
-        PROGRAM_ID
-      );
-      const [profilePda] = PublicKey.findProgramAddressSync(
-        [PROFILE_SEED, publicKey.toBuffer()],
-        PROGRAM_ID
-      );
+      const [factory] = deriveFactoryPda();
+      const [marketPda] = deriveMarketPda(mintKey);
+      const [betPda] = deriveBetPda(marketPda, publicKey);
+      const [profilePda] = deriveProfilePda(publicKey);
 
       const isCancelledMarket = market.status === 'Cancelled';
 

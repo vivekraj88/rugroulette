@@ -11,7 +11,7 @@ import { Buffer } from 'buffer';
 
 import App from './App';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { RugProgramProvider } from './hooks/useProgram';
+import { RugProgramProvider } from './hooks/RugProgramContext';
 import './index.css';
 import '@solana/wallet-adapter-react-ui/styles.css';
 

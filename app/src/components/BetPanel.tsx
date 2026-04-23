@@ -3,7 +3,8 @@ import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { BN } from '@coral-xyz/anchor';
 import { useRugProgram } from '../hooks/useRugProgram';
-import { PROGRAM_ID, FACTORY_SEED, MARKET_SEED, BET_SEED, PROFILE_SEED } from '../lib/constants';
+import { deriveFactoryPda, deriveMarketPda, deriveBetPda, deriveProfilePda } from '../lib/pda';
+import { parseBetAccount } from '../lib/format';
 
 interface BetPanelProps {
   tokenMint: string;
@@ -28,25 +29,17 @@ export function BetPanel({ tokenMint, disabled }: BetPanelProps) {
     if (!publicKey || !connection) { setChecking(false); return; }
 
     const mintKey = new PublicKey(tokenMint);
-    const [marketPda] = PublicKey.findProgramAddressSync(
-      [MARKET_SEED, mintKey.toBuffer()],
-      PROGRAM_ID
-    );
-    const [betPda] = PublicKey.findProgramAddressSync(
-      [BET_SEED, marketPda.toBuffer(), publicKey.toBuffer()],
-      PROGRAM_ID
-    );
+    const [marketPda] = deriveMarketPda(mintKey);
+    const [betPda] = deriveBetPda(marketPda, publicKey);
 
     connection.getAccountInfo(betPda).then((info) => {
       if (info) {
         setAlreadyBet(true);
-        try {
-          const data = info.data;
-          const sideByte = data[72];
-          const amt = Number(data.readBigUInt64LE(73));
-          setExistingBetSide(sideByte === 0 ? 'rug' : 'legit');
-          setExistingBetAmount(amt);
-        } catch { /* fallback */ }
+        const parsed = parseBetAccount(info.data);
+        if (parsed) {
+          setExistingBetSide(parsed.side);
+          setExistingBetAmount(parsed.amount);
+        }
       }
       setChecking(false);
     }).catch(() => setChecking(false));
@@ -61,19 +54,10 @@ export function BetPanel({ tokenMint, disabled }: BetPanelProps) {
     try {
       const mintKey = new PublicKey(tokenMint);
 
-      const [factory] = PublicKey.findProgramAddressSync([FACTORY_SEED], PROGRAM_ID);
-      const [marketPda] = PublicKey.findProgramAddressSync(
-        [MARKET_SEED, mintKey.toBuffer()],
-        PROGRAM_ID
-      );
-      const [userBet] = PublicKey.findProgramAddressSync(
-        [BET_SEED, marketPda.toBuffer(), publicKey.toBuffer()],
-        PROGRAM_ID
-      );
-      const [userProfile] = PublicKey.findProgramAddressSync(
-        [PROFILE_SEED, publicKey.toBuffer()],
-        PROGRAM_ID
-      );
+      const [factory] = deriveFactoryPda();
+      const [marketPda] = deriveMarketPda(mintKey);
+      const [userBet] = deriveBetPda(marketPda, publicKey);
+      const [userProfile] = deriveProfilePda(publicKey);
 
       const parsed = parseFloat(amount.replace(',', '.'));
       if (isNaN(parsed) || parsed <= 0) {

@@ -1,10 +1,7 @@
 import { Link } from 'react-router-dom';
 import type { MarketAccount } from '../hooks/useMarkets';
 import { Countdown } from './Countdown';
-
-function lamportsToSol(lamports: number): string {
-  return (lamports / 1e9).toFixed(2);
-}
+import { solFmt } from '../lib/format';
 
 function scoreColor(score: number): string {
   if (score >= 70) return 'text-error';
@@ -59,7 +56,7 @@ export function MarketCard({ market, index = 0 }: { market: MarketAccount; index
         </div>
 
         <div className="flex justify-between text-[11px] text-base-content/50">
-          <span>{lamportsToSol(totalPool)} SOL</span>
+          <span>{solFmt(totalPool)} SOL</span>
           <span>{market.totalBettors} bettors</span>
           <span>
             {market.status === 'Open' ? (
