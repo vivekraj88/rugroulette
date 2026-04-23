@@ -18,6 +18,7 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+crank/created_markets.json
 
 # misc
 .DS_Store
