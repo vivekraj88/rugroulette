@@ -2,10 +2,10 @@ use anchor_lang::prelude::*;
 
 declare_id!("3AKQmuMpZAMUiKm4pRw1BXFaUzFhx65Pi5XSBoBvkomC");
 
-pub mod constants;
-pub mod errors;
-pub mod instructions;
 pub mod state;
+pub mod constants;
+pub mod instructions;
+pub mod errors;
 
 use instructions::*;
 use state::BetSide;

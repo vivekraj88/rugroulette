@@ -195,7 +195,7 @@ export function LeaderboardPage() {
                     {idx === 0 ? '\u{1F947}' : idx === 1 ? '\u{1F948}' : idx === 2 ? '\u{1F949}' : idx + 1}
                   </td>
                   <td className="font-mono text-xs">
-                    {entry.wallet.slice(0, 4)}...{entry.wallet.slice(-4)}
+                    {entry.wallet.slice(0, 6)}·{entry.wallet.slice(-5)}
                   </td>
                   <td className="text-right">{entry.totalBets}</td>
                   <td className="text-right">
