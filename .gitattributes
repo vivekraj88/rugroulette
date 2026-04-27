@@ -1,0 +1,23 @@
+# keep line endings deterministic across mac / linux / windows
+* text=auto eol=lf
+
+*.tsx        text eol=lf diff=typescript
+*.ts         text eol=lf diff=typescript
+*.css        text eol=lf
+*.html       text eol=lf
+*.md         text eol=lf
+*.json       text eol=lf
+*.toml       text eol=lf
+*.rs         text eol=lf diff=rust
+*.py         text eol=lf diff=python
+
+# binary
+*.png        binary
+*.jpg        binary
+*.svg        binary
+*.ico        binary
+*.woff2      binary
+
+# generated artifacts (keep diff readable)
+package-lock.json   linguist-generated=true diff=text
+target/             linguist-vendored=true
