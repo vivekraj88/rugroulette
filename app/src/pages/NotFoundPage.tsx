@@ -11,6 +11,10 @@ export function NotFoundPage() {
       <Link to="/app" className="btn btn-error btn-sm">
         Back to Markets
       </Link>
+      <span className="badge badge-outline badge-sm gap-1 font-mono mt-2">
+        <span className="w-1.5 h-1.5 rounded-full bg-warning inline-block" aria-hidden />
+        solana devnet
+      </span>
     </div>
   );
 }

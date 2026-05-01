@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { useMarkets, type MarketAccount } from '../hooks/useMarkets';
 import { MarketCard } from '../components/MarketCard';
 
@@ -182,12 +183,15 @@ export function MarketsPage() {
           <p className="text-xs mt-2">Check your connection and refresh</p>
         </div>
       ) : displayed.length === 0 ? (
-        <div className="text-center py-16 text-base-content/40">
+        <div className="text-center py-16 text-base-content/60">
           <div className="text-5xl mb-3 opacity-30">{'\u{1F3B2}'}</div>
-          <p className="text-lg">No active markets</p>
-          <p className="text-xs mt-2">
-            {search ? 'Try a different search term' : 'New markets are added daily — check back soon'}
+          <p className="text-lg font-bold">No active markets</p>
+          <p className="text-xs mt-2 mb-5">
+            {search ? 'Try a different search term — or browse resolved markets below' : 'Scanner is spinning up — fresh markets land daily.'}
           </p>
+          <Link to="/app/history" className="btn btn-error btn-sm btn-outline">
+            See resolved markets
+          </Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
