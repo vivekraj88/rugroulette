@@ -29,7 +29,19 @@ TRACKING_FILE = Path(__file__).parent / "created_markets.json"
 def parse_market_account(data: bytes) -> dict | None:
     """Parse a PredictionMarket account from raw on-chain bytes.
 
-    Returns None if the data is too short or has wrong discriminator.
+    Walks the Anchor-serialised layout field by field. Discriminator
+    is checked first, then bounds are validated before every field
+    read so a truncated or corrupt account returns ``None`` instead of
+    raising ``IndexError``.
+
+    Args:
+        data: Raw account data including the 8-byte Anchor discriminator.
+
+    Returns:
+        Dict with keys ``token_mint``, ``token_name``, ``created_at``,
+        ``resolve_at``, ``total_rug_pool``, ``total_legit_pool``,
+        ``total_bettors``, ``ai_score``, ``status`` — or ``None`` if
+        the bytes don't match the PredictionMarket layout.
     """
     if len(data) < 8 or data[:8] != MARKET_ACCOUNT_DISC:
         return None

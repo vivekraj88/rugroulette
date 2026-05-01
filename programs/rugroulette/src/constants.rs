@@ -1,3 +1,7 @@
+// =============================================================================
+// SEEDS — PDA derivation prefixes
+// =============================================================================
+
 /// PDA seeds for the market factory singleton.
 pub const FACTORY_SEED: &[u8] = b"factory";
 
@@ -10,8 +14,16 @@ pub const BET_SEED: &[u8] = b"bet";
 /// PDA seeds prefix for user profiles.
 pub const PROFILE_SEED: &[u8] = b"profile";
 
+// =============================================================================
+// FEES — protocol economics
+// =============================================================================
+
 /// Default market fee in basis points (3%).
 pub const DEFAULT_FEE_BPS: u16 = 300;
+
+// =============================================================================
+// TIMING — resolution windows
+// =============================================================================
 
 /// Default auto-resolution period in days.
 pub const DEFAULT_RESOLVE_DAYS: u8 = 1;

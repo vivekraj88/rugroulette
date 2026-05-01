@@ -198,6 +198,74 @@ The crank runs three jobs:
 
 ---
 
+## Local Development
+
+A complete loop on your laptop, no shared infra required.
+
+```bash
+# 1. clone + install deps in three places
+git clone https://github.com/vivekraj88/rugroulette.git
+cd rugroulette
+anchor build                       # builds the program
+cd app && npm install && cd ..     # frontend deps
+cd crank && pip install -r requirements.txt && cd ..
+
+# 2. spin a localnet (in a separate terminal)
+solana-test-validator --reset
+
+# 3. fund + deploy the program against localnet
+solana airdrop 5
+anchor deploy --provider.cluster localnet
+
+# 4. seed a few demo markets via the crank (one-shot mode)
+cd crank && python main.py --once
+
+# 5. start the frontend
+cd app && npm run dev
+```
+
+Visit `http://localhost:5173/app/markets` and connect a localnet-funded wallet. Bets, claims, and resolutions all stay local.
+
+---
+
+## Architecture (data flow)
+
+```mermaid
+graph LR
+  A[Birdeye API] -->|new tokens| B[scanner.py]
+  B -->|candidate list| C[ai_scorer.py]
+  C -->|0-100 score| D[market_creator.py]
+  D -->|create_market ix| E[(Anchor program)]
+  E -->|RUG/LEGIT pools| F[Frontend]
+  G[market_resolver.py] -->|resolve_market ix| E
+  E -->|market state| G
+  H[scheduler / APScheduler] --> B
+  H --> G
+```
+
+The crank's three jobs share `created_markets.json` so a restart picks up where the previous run left off.
+
+---
+
+## FAQ
+
+**How is "rug" determined?**
+Three signals at resolution time, evaluated against the market's snapshot at creation: (1) price dropped more than 90 %; (2) liquidity drained below the floor; (3) the deployer wallet sold their entire position. Hitting any one of those three flips the market to `RUGGED`. Otherwise it resolves `LEGIT`.
+
+**What if the market can't be resolved (oracle silent, token delisted)?**
+The factory authority can call `cancel_market`, which halts new bets and switches the market to a refund-eligible state. Both sides reclaim their stake via `claim_refund` — no winner, no fee taken.
+
+**Is there a protocol fee?**
+Yes — 3 % of the losing pool is sent to the factory treasury before payouts are split among winners. Refund cancellations take **no** fee.
+
+**Why devnet only?**
+Token data feeds (Birdeye, on-chain price oracles) lag less on mainnet, but rug-pull simulation on real funds is irresponsible. Devnet keeps the experimentation honest while the resolver heuristics get hardened.
+
+**Can I run my own crank?**
+Yes — the program permits anyone to call `resolve_market` after `resolve_at`. Set `RPC_URL` + `WALLET_PATH` in your `.env` and run `python main.py`. Multiple crankers racing to resolve is fine; the program is idempotent on a `Resolved` market.
+
+---
+
 ## License
 
 MIT
